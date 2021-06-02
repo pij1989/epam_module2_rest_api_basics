@@ -1,22 +1,14 @@
-package com.epam.esm.entity;
+package com.epam.esm.model.entity;
 
 public class Tag extends Entity {
-    private long id;
+    private Long id;
     private String name;
 
-    public Tag() {
-    }
-
-    public Tag(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -35,13 +27,13 @@ public class Tag extends Entity {
 
         Tag tag = (Tag) o;
 
-        if (id != tag.id) return false;
+        if (id != null ? !id.equals(tag.id) : tag.id != null) return false;
         return name != null ? name.equals(tag.name) : tag.name == null;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
