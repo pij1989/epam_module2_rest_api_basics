@@ -1,6 +1,6 @@
 package com.epam.esm.entity;
 
-public class Tag {
+public class Tag extends Entity {
     private long id;
     private String name;
 
