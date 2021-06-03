@@ -36,4 +36,10 @@ public class TagServiceImpl implements TagService {
     public List<Tag> findAllTag() {
         return tagDao.findAll();
     }
+
+    @Override
+    @Transactional
+    public boolean deleteTag(Long id) {
+        return tagDao.deleteById(id);
+    }
 }

@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.model.entity.Tag;
+import com.epam.esm.model.exception.TagNotFoundException;
 import com.epam.esm.model.service.TagService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,20 +37,26 @@ public class TagController {
     }
 
     @GetMapping("/tags/{id}")
-    ResponseEntity<Tag> findTag(@PathVariable Long id){
+    ResponseEntity<Tag> findTag(@PathVariable Long id) throws TagNotFoundException {
         logger.debug("Path variable: " + id);
-       Optional<Tag>optionalTag = tagService.findTag(id);
-       if(optionalTag.isPresent()){
-           Tag tag = optionalTag.get();
-           return new ResponseEntity<>(tag,HttpStatus.OK);
-       } else {
-           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-       }
+        Optional<Tag> optionalTag = tagService.findTag(id);
+        return optionalTag.map(tag -> new ResponseEntity<>(tag, HttpStatus.OK))
+                .orElseThrow(() -> new TagNotFoundException("Tag not found, id = " + id));
     }
 
     @GetMapping("/tags")
     ResponseEntity<List<Tag>> findAllTags() {
         List<Tag> tags = tagService.findAllTag();
-        return new ResponseEntity<>(tags,HttpStatus.OK);
+        return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/tags/{id}")
+    ResponseEntity<Object> deleteTag(@PathVariable Long id) {
+        logger.debug("Path variable: " + id);
+        if (tagService.deleteTag(id)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

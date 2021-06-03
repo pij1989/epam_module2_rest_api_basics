@@ -19,6 +19,7 @@ public class TagDaoImpl implements TagDao {
     private static final String CREATE_TAG_SQL = "INSERT INTO tag (name) VALUES (?)";
     private static final String FIND_TAG_BY_ID_SQL = "SELECT id,name FROM tag WHERE id = ?";
     private static final String FIND_ALL_TAG_SQL = "SELECT id,name FROM tag";
+    private static final String DELETE_TAG_BY_ID_SQL = "DELETE FROM tag WHERE id = ?";
     private JdbcTemplate jdbcTemplate;
     private final RowMapper<Tag> rowMapper = (resultSet, rowNum) -> {
         Tag tag = new Tag();
@@ -47,8 +48,19 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> findById(Long id) {
-        Tag tag = jdbcTemplate.queryForObject(FIND_TAG_BY_ID_SQL, rowMapper, id);
-        return Optional.ofNullable(tag);
+        return jdbcTemplate.query(FIND_TAG_BY_ID_SQL,
+                resultSet -> {
+                    if (resultSet.next()) {
+                        Tag tag = new Tag();
+                        tag.setId(resultSet.getLong(ColumnName.ID));
+                        tag.setName(resultSet.getString(ColumnName.NAME));
+                        return Optional.of(tag);
+                    }
+                    return Optional.empty();
+                },
+                id);
+//        Tag tag = jdbcTemplate.queryForObject(FIND_TAG_BY_ID_SQL, rowMapper, id);
+//        return Optional.ofNullable(foundTag);
     }
 
     @Override
@@ -58,11 +70,12 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> update(Tag entity) {
-        return Optional.empty();
+        throw new UnsupportedOperationException("Unsupported operation 'update' for TagDao");
     }
 
     @Override
-    public void deleteById(Long id) {
-
+    public boolean deleteById(Long id) {
+        int result = jdbcTemplate.update(DELETE_TAG_BY_ID_SQL, id);
+        return result > 0;
     }
 }

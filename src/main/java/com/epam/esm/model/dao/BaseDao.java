@@ -14,5 +14,5 @@ public interface BaseDao<K, T extends Entity> {
 
     Optional<T> update(T entity);
 
-    void deleteById(K id);
+    boolean deleteById(K id);
 }

@@ -1,5 +1,6 @@
 package com.epam.esm.configuration;
 
+import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -48,5 +49,13 @@ public class WebAppConfiguration {
     @Bean
     public PlatformTransactionManager txManager(@Autowired DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
+    }
+
+    @Bean
+    public SpringLiquibase liquibase() {
+        SpringLiquibase springLiquibase = new SpringLiquibase();
+        springLiquibase.setChangeLog("classpath:changeLog.xml");
+        springLiquibase.setDataSource(dataSource());
+        return springLiquibase;
     }
 }

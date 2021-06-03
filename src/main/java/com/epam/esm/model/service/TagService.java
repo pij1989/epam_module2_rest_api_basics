@@ -11,4 +11,6 @@ public interface TagService {
     Optional<Tag> findTag(Long id);
 
     List<Tag> findAllTag();
+
+    boolean deleteTag(Long id);
 }
