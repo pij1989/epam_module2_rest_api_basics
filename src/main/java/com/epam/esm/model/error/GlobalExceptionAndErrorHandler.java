@@ -1,5 +1,6 @@
 package com.epam.esm.model.error;
 
+import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.TagNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,14 @@ public class GlobalExceptionAndErrorHandler {
         customError.setErrorMessage(e.getMessage());
         customError.setErrorCode(Integer.toString(HttpStatus.NOT_FOUND.value()));
         return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> customHandleBadRequest(Exception e) {
+        CustomError customError = new CustomError();
+        customError.setErrorMessage(e.getMessage());
+        customError.setErrorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()));
+        return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

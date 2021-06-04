@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class GiftCertificates extends Entity {
+public class GiftCertificate extends Entity {
     private long id;
     private String name;
     private String description;
@@ -13,11 +13,11 @@ public class GiftCertificates extends Entity {
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
 
-    public GiftCertificates() {
+    public GiftCertificate() {
     }
 
-    public GiftCertificates(String name, String description, BigDecimal price, LocalDate duration,
-                            LocalDateTime createDate, LocalDateTime lastUpdateDate) {
+    public GiftCertificate(String name, String description, BigDecimal price, LocalDate duration,
+                           LocalDateTime createDate, LocalDateTime lastUpdateDate) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -87,7 +87,7 @@ public class GiftCertificates extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        GiftCertificates that = (GiftCertificates) o;
+        GiftCertificate that = (GiftCertificate) o;
 
         if (id != that.id) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
