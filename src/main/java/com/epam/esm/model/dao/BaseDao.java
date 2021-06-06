@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BaseDao<K, T extends Entity> {
-    Optional<T> create(T entity);
+    T create(T entity);
 
     Optional<T> findById(K id);
 

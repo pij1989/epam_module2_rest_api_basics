@@ -22,7 +22,10 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public Optional<Tag> create(Tag tag) {
-        return tagDao.create(tag);
+        if (tag != null) {
+            return Optional.of(tagDao.create(tag));
+        }
+        return Optional.empty();
     }
 
     @Override
