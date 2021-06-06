@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,12 +23,7 @@ public class TagDaoImpl implements TagDao {
     private static final String FIND_ALL_TAG_SQL = "SELECT id,name FROM tag";
     private static final String DELETE_TAG_BY_ID_SQL = "DELETE FROM tag WHERE id = ?";
     private JdbcTemplate jdbcTemplate;
-    private final RowMapper<Tag> rowMapper = (resultSet, rowNum) -> {
-        Tag tag = new Tag();
-        tag.setId(resultSet.getLong(ColumnName.ID));
-        tag.setName(resultSet.getString(ColumnName.NAME));
-        return tag;
-    };
+    private final RowMapper<Tag> rowMapper = (resultSet, rowNum) -> createTagFromResultSet(resultSet);
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -51,9 +48,7 @@ public class TagDaoImpl implements TagDao {
         return jdbcTemplate.query(FIND_TAG_BY_ID_SQL,
                 resultSet -> {
                     if (resultSet.next()) {
-                        Tag tag = new Tag();
-                        tag.setId(resultSet.getLong(ColumnName.ID));
-                        tag.setName(resultSet.getString(ColumnName.NAME));
+                        Tag tag = createTagFromResultSet(resultSet);
                         return Optional.of(tag);
                     }
                     return Optional.empty();
@@ -77,5 +72,12 @@ public class TagDaoImpl implements TagDao {
     public boolean deleteById(Long id) {
         int result = jdbcTemplate.update(DELETE_TAG_BY_ID_SQL, id);
         return result > 0;
+    }
+
+    private Tag createTagFromResultSet(ResultSet resultSet) throws SQLException {
+        Tag tag = new Tag();
+        tag.setId(resultSet.getLong(ColumnName.ID));
+        tag.setName(resultSet.getString(ColumnName.NAME));
+        return tag;
     }
 }
