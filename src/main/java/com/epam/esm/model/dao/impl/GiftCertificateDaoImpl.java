@@ -18,6 +18,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String CREATE_GIFT_CERTIFICATE_SQL = "INSERT INTO gift_certificate(name,description,price,duration,create_date,last_update_date) VALUES (?,?,?,?,?,?)";
     private static final String FIND_GIFT_CERTIFICATE_BY_ID_SQL = "SELECT id,name,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE id = ?";
     private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT id,name,description,price,duration,create_date,last_update_date FROM gift_certificate";
+    private static final String DELETE_GIFT_CERTIFICATE_SQL = "DELETE FROM gift_certificate WHERE id = ?";
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -97,7 +98,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public boolean deleteById(Long id) {
-        return false;
+        int result = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_SQL, id);
+        return result > 0;
     }
 
     private GiftCertificate createGiftCertificateFromResultSet(ResultSet rs) throws SQLException {

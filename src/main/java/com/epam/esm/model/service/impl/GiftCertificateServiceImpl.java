@@ -48,4 +48,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
         return Optional.empty();
     }
+
+    @Override
+    public boolean deleteGiftCertificate(Long id) {
+        return giftCertificateDao.deleteById(id);
+    }
 }

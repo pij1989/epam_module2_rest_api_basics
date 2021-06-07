@@ -74,4 +74,21 @@ public class GiftCertificateController {
         return optionalGiftCertificate.map(certificate -> new ResponseEntity<>(certificate, HttpStatus.OK))
                 .orElseThrow(() -> new GiftCertificateNotFoundException("Gift certificate not found, id = " + id));
     }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Object> deleteGiftCertificate(@PathVariable String id) throws BadRequestException, GiftCertificateNotFoundException {
+        logger.debug("Path variable: " + id);
+        long parseId;
+        try {
+            parseId = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException("Bad request, id = " + id, e);
+        }
+        if (giftCertificateService.deleteGiftCertificate(parseId)) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            throw new GiftCertificateNotFoundException("Gift certificate not found, id = " + id);
+        }
+    }
 }
