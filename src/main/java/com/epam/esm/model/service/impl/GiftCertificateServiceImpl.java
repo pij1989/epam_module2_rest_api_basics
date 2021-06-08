@@ -3,6 +3,7 @@ package com.epam.esm.model.service.impl;
 import com.epam.esm.model.dao.GiftCertificateDao;
 import com.epam.esm.model.dao.TagDao;
 import com.epam.esm.model.entity.GiftCertificate;
+import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (optionalGiftCertificate.isPresent()) {
             giftCertificate.setId(id);
             return giftCertificateDao.update(giftCertificate);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public Optional<Tag> createTagInGiftCertificate(Long certificateId, Tag tag) {
+        if (tag != null && giftCertificateDao.findById(certificateId).isPresent()) {
+            Tag createdTag = tagDao.create(tag);
+            Long tagId = createdTag.getId();
+            return giftCertificateDao.addTagToCertificate(certificateId, tagId) ? Optional.of(createdTag) : Optional.empty();
         }
         return Optional.empty();
     }

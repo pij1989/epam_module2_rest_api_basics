@@ -1,6 +1,7 @@
 package com.epam.esm.model.service;
 
 import com.epam.esm.model.entity.GiftCertificate;
+import com.epam.esm.model.entity.Tag;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,8 @@ public interface GiftCertificateService {
     List<GiftCertificate> findAllGiftCertificate();
 
     Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate,Long id);
+
+    Optional<Tag> createTagInGiftCertificate(Long certificateId, Tag tag);
 
     boolean addTagToGiftCertificate(Long certificateId, Long tagId);
 
