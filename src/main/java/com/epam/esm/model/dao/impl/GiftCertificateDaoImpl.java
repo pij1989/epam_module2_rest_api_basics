@@ -9,7 +9,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String FIND_GIFT_CERTIFICATE_BY_ID_SQL = "SELECT id,name,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE id = ?";
     private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT id,name,description,price,duration,create_date,last_update_date FROM gift_certificate";
     private static final String DELETE_GIFT_CERTIFICATE_SQL = "DELETE FROM gift_certificate WHERE id = ?";
+    private static final String ADD_TAG_TO_GIFT_CERTIFICATE_SQL = "INSERT INTO gift_certificate_tag(gift_certificate_id, tag_id) VALUES (?,?)";
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -34,7 +38,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             preparedStatement.setString(1, giftCertificate.getName());
             preparedStatement.setString(2, giftCertificate.getDescription());
             preparedStatement.setBigDecimal(3, giftCertificate.getPrice());
-            preparedStatement.setDate(4, Date.valueOf(giftCertificate.getDuration()));
+            preparedStatement.setInt(4, giftCertificate.getDuration());
             preparedStatement.setTimestamp(5, Timestamp.valueOf(giftCertificate.getCreateDate()));
             preparedStatement.setTimestamp(6, Timestamp.valueOf(giftCertificate.getLastUpdateDate()));
             return preparedStatement;
@@ -80,7 +84,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                             rs.updateBigDecimal(ColumnName.PRICE, giftCertificate.getPrice());
                         }
                         if (giftCertificate.getDuration() != null) {
-                            rs.updateDate(ColumnName.DURATION, Date.valueOf(giftCertificate.getDuration()));
+                            rs.updateInt(ColumnName.DURATION, giftCertificate.getDuration());
                         }
                         if (giftCertificate.getCreateDate() != null) {
                             rs.updateTimestamp(ColumnName.CREATE_DATE, Timestamp.valueOf(giftCertificate.getCreateDate()));
@@ -102,13 +106,19 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return result > 0;
     }
 
+    @Override
+    public boolean addTagToCertificate(Long certificateId, Long tagId) {
+        int result = jdbcTemplate.update(ADD_TAG_TO_GIFT_CERTIFICATE_SQL, certificateId, tagId);
+        return result > 0;
+    }
+
     private GiftCertificate createGiftCertificateFromResultSet(ResultSet rs) throws SQLException {
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setId(rs.getLong(ColumnName.ID));
         giftCertificate.setName(rs.getString(ColumnName.NAME));
         giftCertificate.setDescription(rs.getString(ColumnName.DESCRIPTION));
         giftCertificate.setPrice(rs.getBigDecimal(ColumnName.PRICE));
-        giftCertificate.setDuration(rs.getDate(ColumnName.DURATION).toLocalDate());
+        giftCertificate.setDuration(rs.getInt(ColumnName.DURATION));
         giftCertificate.setCreateDate(rs.getTimestamp(ColumnName.CREATE_DATE).toLocalDateTime());
         giftCertificate.setLastUpdateDate(rs.getTimestamp(ColumnName.LAST_UPDATE_DATE).toLocalDateTime());
         return giftCertificate;

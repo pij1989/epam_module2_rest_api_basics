@@ -22,7 +22,7 @@
             name character varying(100) NOT NULL,
             description text,
             price numeric(6,2),
-            duration date NOT NULL,
+            duration int NOT NULL,
             create_date timestamp without time zone NOT NULL,
             last_update_date timestamp without time zone NOT NULL,
             CONSTRAINT gift_certificate_pkey PRIMARY KEY (id)

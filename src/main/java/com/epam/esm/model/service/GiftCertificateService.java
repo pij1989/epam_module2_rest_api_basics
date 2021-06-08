@@ -14,5 +14,7 @@ public interface GiftCertificateService {
 
     Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate,Long id);
 
+    boolean addTagToGiftCertificate(Long certificateId, Long tagId);
+
     boolean deleteGiftCertificate(Long id);
 }

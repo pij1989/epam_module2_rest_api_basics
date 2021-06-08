@@ -1,8 +1,7 @@
 package com.epam.esm.model.error;
 
 import com.epam.esm.model.exception.BadRequestException;
-import com.epam.esm.model.exception.GiftCertificateNotFoundException;
-import com.epam.esm.model.exception.TagNotFoundException;
+import com.epam.esm.model.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,7 +11,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @RestControllerAdvice
 public class GlobalExceptionAndErrorHandler {
 
-    @ExceptionHandler({TagNotFoundException.class, GiftCertificateNotFoundException.class})
+    @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<Object> customHandleNotFound(Exception e) {
         CustomError customError = new CustomError();
         customError.setErrorMessage(e.getMessage());

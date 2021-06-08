@@ -2,7 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.model.entity.Tag;
 import com.epam.esm.model.exception.BadRequestException;
-import com.epam.esm.model.exception.TagNotFoundException;
+import com.epam.esm.model.exception.NotFoundException;
 import com.epam.esm.model.service.TagService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,7 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Tag> findTag(@PathVariable String id) throws TagNotFoundException, BadRequestException {
+    ResponseEntity<Tag> findTag(@PathVariable String id) throws NotFoundException, BadRequestException {
         logger.debug("Path variable: " + id);
         long parseId;
         try {
@@ -49,7 +49,7 @@ public class TagController {
         }
         Optional<Tag> optionalTag = tagService.findTag(parseId);
         return optionalTag.map(tag -> new ResponseEntity<>(tag, HttpStatus.OK))
-                .orElseThrow(() -> new TagNotFoundException("Tag not found, id = " + id));
+                .orElseThrow(() -> new NotFoundException("Tag not found, id = " + id));
     }
 
     @GetMapping
@@ -59,7 +59,7 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteTag(@PathVariable String id) throws TagNotFoundException, BadRequestException {
+    ResponseEntity<Object> deleteTag(@PathVariable String id) throws NotFoundException, BadRequestException {
         logger.debug("Path variable: " + id);
         long parseId;
         try {
@@ -71,7 +71,7 @@ public class TagController {
         if (tagService.deleteTag(parseId)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            throw new TagNotFoundException("Tag not found, id = " + id);
+            throw new NotFoundException("Tag not found, id = " + id);
         }
     }
 }
