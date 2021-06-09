@@ -22,8 +22,7 @@ import java.util.Optional;
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String CREATE_GIFT_CERTIFICATE_SQL = "INSERT INTO gift_certificate(name,description,price,duration,create_date,last_update_date) VALUES (?,?,?,?,?,?)";
     private static final String FIND_GIFT_CERTIFICATE_BY_ID_SQL = "SELECT gc.id AS gift_certificate_id,gc.name AS gift_certificate_name,gc.description,gc.price,gc.duration,gc.create_date,gc.last_update_date,t.id AS tag_id,t.name AS tag_name FROM gift_certificate AS gc LEFT JOIN gift_certificate_tag ON gc.id = gift_certificate_id LEFT JOIN tag AS t ON t.id = tag_id  WHERE gc.id = ?";
-    //    private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT id AS gift_certificate_id,name AS gift_certificate_name,description,price,duration,create_date,last_update_date FROM gift_certificate";
-    private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT gc.id AS gift_certificate_id,gc.name AS gift_certificate_name,gc.description,gc.price,gc.duration,gc.create_date,gc.last_update_date,t.id AS tag_id,t.name AS tag_name FROM gift_certificate AS gc LEFT JOIN gift_certificate_tag ON gc.id = gift_certificate_id LEFT JOIN tag AS t ON t.id = tag_id ORDER BY gc.id";
+    private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT id AS gift_certificate_id,name AS gift_certificate_name,description,price,duration,create_date,last_update_date FROM gift_certificate";
     private static final String DELETE_GIFT_CERTIFICATE_SQL = "DELETE FROM gift_certificate WHERE id = ?";
     private static final String ADD_TAG_TO_GIFT_CERTIFICATE_SQL = "INSERT INTO gift_certificate_tag(gift_certificate_id, tag_id) VALUES (?,?)";
     private JdbcTemplate jdbcTemplate;
