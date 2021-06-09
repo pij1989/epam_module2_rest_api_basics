@@ -14,8 +14,8 @@ import java.util.Optional;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    private GiftCertificateDao giftCertificateDao;
-    private TagDao tagDao;
+    private final GiftCertificateDao giftCertificateDao;
+    private final TagDao tagDao;
 
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, TagDao tagDao) {
@@ -37,6 +37,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public List<GiftCertificate> findAllGiftCertificate() {
         return giftCertificateDao.findAll();
     }
