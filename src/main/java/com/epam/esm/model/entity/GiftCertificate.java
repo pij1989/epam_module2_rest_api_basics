@@ -1,10 +1,14 @@
 package com.epam.esm.model.entity;
 
+import com.epam.esm.util.GiftCertificateSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonSerialize(using = GiftCertificateSerializer.class)
 public class GiftCertificate extends Entity {
     private Long id;
     private String name;
