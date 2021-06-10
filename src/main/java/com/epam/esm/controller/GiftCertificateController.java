@@ -52,9 +52,23 @@ public class GiftCertificateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GiftCertificate>> findAllGiftCertificate() {
+    public ResponseEntity<List<GiftCertificate>> findAllGiftCertificate() throws NotFoundException {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllGiftCertificate();
-        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+        if (!giftCertificates.isEmpty()) {
+            return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+        } else {
+            throw new NotFoundException("Gift certificates not found");
+        }
+    }
+
+    @GetMapping("/tags")
+    public ResponseEntity<List<GiftCertificate>> findGiftCertificateByTagName(@RequestParam String name) throws NotFoundException {
+        List<GiftCertificate> giftCertificates = giftCertificateService.findGiftCertificateByTagName(name);
+        if (!giftCertificates.isEmpty()) {
+            return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+        } else {
+            throw new NotFoundException("Gift certificates not found, tag name = " + name);
+        }
     }
 
     @PutMapping("/{certificateId}")
@@ -73,10 +87,26 @@ public class GiftCertificateController {
                 .orElseThrow(() -> new NotFoundException("Gift certificate not found, id = " + certificateId));
     }
 
+    @PatchMapping("/{certificateId}")
+    public ResponseEntity<GiftCertificate> updatePartOfGiftCertificate(@RequestBody GiftCertificate giftCertificate,
+                                                                       @PathVariable String certificateId) throws BadRequestException, NotFoundException {
+        logger.debug("Path variable: " + certificateId);
+        long parseId;
+        try {
+            parseId = Long.parseLong(certificateId);
+        } catch (NumberFormatException e) {
+            logger.error("Bad request:" + e.getMessage());
+            throw new BadRequestException("Bad request, id = " + certificateId, e);
+        }
+        Optional<GiftCertificate> optionalGiftCertificate = giftCertificateService.updatePartGiftCertificate(giftCertificate, parseId);
+        return optionalGiftCertificate.map(certificate -> new ResponseEntity<>(certificate, HttpStatus.OK))
+                .orElseThrow(() -> new NotFoundException("Gift certificate not found, id = " + certificateId));
+    }
+
     @PostMapping("{certificateId}/tags")
     public ResponseEntity<Tag> createTagInGiftCertificate(@PathVariable String certificateId,
-                                                             @RequestBody Tag tag,
-                                                             HttpServletRequest request) throws BadRequestException {
+                                                          @RequestBody Tag tag,
+                                                          HttpServletRequest request) throws BadRequestException {
         logger.debug("Path variable: " + certificateId);
         long parseId;
         try {
@@ -90,7 +120,7 @@ public class GiftCertificateController {
             HttpHeaders responseHeaders = new HttpHeaders();
             String location = request.getRequestURL().append("/").append(createdTag.getId()).toString();
             responseHeaders.set(HttpHeaders.LOCATION, location);
-            return new ResponseEntity<>(createdTag,responseHeaders,HttpStatus.CREATED);
+            return new ResponseEntity<>(createdTag, responseHeaders, HttpStatus.CREATED);
         }).orElseThrow(() -> new BadRequestException("Bad request, tag in gift certificate not be created"));
     }
 

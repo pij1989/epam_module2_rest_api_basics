@@ -15,9 +15,13 @@ public interface GiftCertificateService {
 
     Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate,Long id);
 
+    Optional<GiftCertificate> updatePartGiftCertificate(GiftCertificate giftCertificate,Long id);
+
     Optional<Tag> createTagInGiftCertificate(Long certificateId, Tag tag);
 
     boolean addTagToGiftCertificate(Long certificateId, Long tagId);
 
     boolean deleteGiftCertificate(Long id);
+
+    List<GiftCertificate> findGiftCertificateByTagName(String name);
 }

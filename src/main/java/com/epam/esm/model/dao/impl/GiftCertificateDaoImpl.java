@@ -21,13 +21,14 @@ import java.util.stream.Collectors;
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String CREATE_GIFT_CERTIFICATE_SQL = "INSERT INTO gift_certificate(name,description,price,duration,create_date,last_update_date) VALUES (?,?,?,?,?,?)";
-    private static final String FIND_GIFT_CERTIFICATE_BY_ID_SQL = "SELECT id AS gift_certificate_id,name AS gift_certificate_name,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE id = ?";
+    private static final String FIND_GIFT_CERTIFICATE_BY_ID_SQL = "SELECT id,name,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE id = ?";
     private static final String FIND_GIFT_CERTIFICATE_TAG_BY_GIFT_CERTIFICATE_ID_SQL = "SELECT t.id AS tag_id,t.name AS tag_name FROM gift_certificate_tag AS gct JOIN tag AS t ON gct.tag_id = t.id WHERE gct.gift_certificate_id = ?";
-    private static final String FIND_GIFT_CERTIFICATE_TAG_BY_TAG_ID_SQL = "SELECT gc.id AS gift_certificate_id,gc.name AS gift_certificate_name,gc.description,gc.price,gc.duration,gc.create_date,gc.last_update_date FROM gift_certificate_tag AS gct JOIN gift_certificate AS gc ON gct.gift_certificate_id = gc.id WHERE gct.tag_id = ?";
-    //    private static final String FIND_GIFT_CERTIFICATE_BY_ID_SQL = "SELECT gc.id AS gift_certificate_id,gc.name AS gift_certificate_name,gc.description,gc.price,gc.duration,gc.create_date,gc.last_update_date,t.id AS tag_id,t.name AS tag_name FROM gift_certificate AS gc LEFT JOIN gift_certificate_tag ON gc.id = gift_certificate_id LEFT JOIN tag AS t ON t.id = tag_id  WHERE gc.id = ?";
-    private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT id AS gift_certificate_id,name AS gift_certificate_name,description,price,duration,create_date,last_update_date FROM gift_certificate";
+    private static final String FIND_GIFT_CERTIFICATE_TAG_BY_TAG_ID_SQL = "SELECT gc.id,gc.name,gc.description,gc.price,gc.duration,gc.create_date,gc.last_update_date FROM gift_certificate_tag AS gct JOIN gift_certificate AS gc ON gct.gift_certificate_id = gc.id WHERE gct.tag_id = ?";
+    private static final String FIND_ALL_GIFT_CERTIFICATE_SQL = "SELECT id,name,description,price,duration,create_date,last_update_date FROM gift_certificate ORDER BY id";
     private static final String DELETE_GIFT_CERTIFICATE_SQL = "DELETE FROM gift_certificate WHERE id = ?";
     private static final String ADD_TAG_TO_GIFT_CERTIFICATE_SQL = "INSERT INTO gift_certificate_tag(gift_certificate_id, tag_id) VALUES (?,?)";
+    private static final String UPDATE_GIFT_CERTIFICATE_SQL = "UPDATE gift_certificate SET name = ?, description = ?,price = ?,duration = ?,create_date = ?,last_update_date = ? WHERE id = ?";
+    private static final String FIND_GIFT_CERTIFICATE_BY_TAG_NAME_SQL = "SELECT gc.id,gc.name,gc.description,gc.price,gc.duration,gc.create_date,gc.last_update_date FROM gift_certificate AS gc JOIN gift_certificate_tag ON gc.id = gift_certificate_id JOIN tag AS t ON t.id = tag_id WHERE t.name = ?";
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -79,6 +80,26 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public Optional<GiftCertificate> update(GiftCertificate giftCertificate) {
+        int result = jdbcTemplate.update(UPDATE_GIFT_CERTIFICATE_SQL, giftCertificate.getName(), giftCertificate.getDescription(),
+                giftCertificate.getPrice(), giftCertificate.getDuration(), giftCertificate.getCreateDate(),
+                giftCertificate.getLastUpdateDate(), giftCertificate.getId());
+        return result > 0 ? Optional.of(giftCertificate) : Optional.empty();
+    }
+
+    @Override
+    public boolean deleteById(Long id) {
+        int result = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_SQL, id);
+        return result > 0;
+    }
+
+    @Override
+    public boolean addTagToCertificate(Long certificateId, Long tagId) {
+        int result = jdbcTemplate.update(ADD_TAG_TO_GIFT_CERTIFICATE_SQL, certificateId, tagId);
+        return result > 0;
+    }
+
+    @Override
+    public Optional<GiftCertificate> updatePart(GiftCertificate giftCertificate) {
         return jdbcTemplate.query(connection -> {
                     PreparedStatement preparedStatement = connection.prepareStatement(FIND_GIFT_CERTIFICATE_BY_ID_SQL,
                             ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -106,29 +127,28 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                             rs.updateTimestamp(ColumnName.LAST_UPDATE_DATE, Timestamp.valueOf(giftCertificate.getLastUpdateDate()));
                         }
                         rs.updateRow();
-                        GiftCertificate updatedGiftCertificate = createGiftCertificateWithoutTagsFromResultSet(rs);
-                        return Optional.of(updatedGiftCertificate);
+                        return Optional.of(createGiftCertificateWithoutTagsFromResultSet(rs));
                     }
                     return Optional.empty();
                 });
     }
 
     @Override
-    public boolean deleteById(Long id) {
-        int result = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_SQL, id);
-        return result > 0;
-    }
-
-    @Override
-    public boolean addTagToCertificate(Long certificateId, Long tagId) {
-        int result = jdbcTemplate.update(ADD_TAG_TO_GIFT_CERTIFICATE_SQL, certificateId, tagId);
-        return result > 0;
+    public List<GiftCertificate> findGiftCertificatesByTagName(String name) {
+        List<GiftCertificate> giftCertificates = jdbcTemplate.query(FIND_GIFT_CERTIFICATE_BY_TAG_NAME_SQL,
+                (rs, rowNum) -> createGiftCertificateWithoutTagsFromResultSet(rs), name);
+        return giftCertificates.stream()
+                .peek(giftCertificate -> {
+                    Long id = giftCertificate.getId();
+                    addTagsToGiftCertificate(giftCertificate, id);
+                })
+                .collect(Collectors.toList());
     }
 
     private GiftCertificate createGiftCertificateWithoutTagsFromResultSet(ResultSet rs) throws SQLException {
         GiftCertificate giftCertificate = new GiftCertificate();
-        giftCertificate.setId(rs.getLong(ColumnName.GIFT_CERTIFICATE_ID));
-        giftCertificate.setName(rs.getString(ColumnName.GIFT_CERTIFICATE_NAME));
+        giftCertificate.setId(rs.getLong(ColumnName.ID));
+        giftCertificate.setName(rs.getString(ColumnName.NAME));
         giftCertificate.setDescription(rs.getString(ColumnName.DESCRIPTION));
         giftCertificate.setPrice(rs.getBigDecimal(ColumnName.PRICE));
         giftCertificate.setDuration(rs.getInt(ColumnName.DURATION));

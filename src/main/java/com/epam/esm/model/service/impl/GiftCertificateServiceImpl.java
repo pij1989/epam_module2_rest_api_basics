@@ -24,6 +24,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public Optional<GiftCertificate> createGiftCertificate(GiftCertificate giftCertificate) {
         if (giftCertificate != null) {
             return Optional.of(giftCertificateDao.create(giftCertificate));
@@ -32,6 +33,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public Optional<GiftCertificate> findGiftCertificate(Long id) {
         return giftCertificateDao.findById(id);
     }
@@ -43,6 +45,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate, Long id) {
         if (giftCertificate == null) {
             return Optional.empty();
@@ -51,6 +54,20 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (optionalGiftCertificate.isPresent()) {
             giftCertificate.setId(id);
             return giftCertificateDao.update(giftCertificate);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public Optional<GiftCertificate> updatePartGiftCertificate(GiftCertificate giftCertificate, Long id) {
+        if (giftCertificate == null) {
+            return Optional.empty();
+        }
+        Optional<GiftCertificate> optionalGiftCertificate = giftCertificateDao.findById(id);
+        if (optionalGiftCertificate.isPresent()) {
+            giftCertificate.setId(id);
+            return giftCertificateDao.updatePart(giftCertificate);
         }
         return Optional.empty();
     }
@@ -79,7 +96,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public boolean deleteGiftCertificate(Long id) {
         return giftCertificateDao.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public List<GiftCertificate> findGiftCertificateByTagName(String name) {
+        return giftCertificateDao.findGiftCertificatesByTagName(name);
     }
 }
