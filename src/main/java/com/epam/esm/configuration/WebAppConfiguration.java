@@ -1,5 +1,7 @@
 package com.epam.esm.configuration;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,18 +10,24 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 @Configuration
 @ComponentScan("com.epam.esm")
 @PropertySource("classpath:database.properties")
 @EnableWebMvc
-public class WebAppConfiguration {
+public class WebAppConfiguration implements WebMvcConfigurer {
     private static final String DB_URL = "db.url";
     private static final String DB_USERNAME = "db.username";
     private static final String DB_PASSWORD = "db.password";
@@ -57,5 +65,14 @@ public class WebAppConfiguration {
         springLiquibase.setChangeLog("classpath:changeLog.xml");
         springLiquibase.setDataSource(dataSource());
         return springLiquibase;
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
+                .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME))
+                .serializationInclusion(JsonInclude.Include.NON_NULL)
+                .serializationInclusion(JsonInclude.Include.NON_EMPTY);
+        converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
     }
 }
