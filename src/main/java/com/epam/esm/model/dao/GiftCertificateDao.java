@@ -11,4 +11,6 @@ public interface GiftCertificateDao extends BaseDao<Long, GiftCertificate> {
     Optional<GiftCertificate> updatePart(GiftCertificate giftCertificate);
 
     List<GiftCertificate> findGiftCertificatesByTagName(String name);
+
+    List<GiftCertificate> findGiftCertificateLikeNameOrDescription(String filter);
 }

@@ -4,6 +4,7 @@ import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -33,5 +34,13 @@ public class GlobalExceptionAndErrorHandler {
         customError.setErrorMessage("Resource not found");
         customError.setErrorCode(Integer.toString(HttpStatus.NOT_FOUND.value()));
         return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Object> handleBadRequest() {
+        CustomError customError = new CustomError();
+        customError.setErrorMessage("Bad request");
+        customError.setErrorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()));
+        return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
     }
 }

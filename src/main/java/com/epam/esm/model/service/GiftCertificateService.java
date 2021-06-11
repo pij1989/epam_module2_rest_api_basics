@@ -13,9 +13,9 @@ public interface GiftCertificateService {
 
     List<GiftCertificate> findAllGiftCertificate();
 
-    Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate,Long id);
+    Optional<GiftCertificate> updateGiftCertificate(GiftCertificate giftCertificate, Long id);
 
-    Optional<GiftCertificate> updatePartGiftCertificate(GiftCertificate giftCertificate,Long id);
+    Optional<GiftCertificate> updatePartGiftCertificate(GiftCertificate giftCertificate, Long id);
 
     Optional<Tag> createTagInGiftCertificate(Long certificateId, Tag tag);
 
@@ -24,4 +24,8 @@ public interface GiftCertificateService {
     boolean deleteGiftCertificate(Long id);
 
     List<GiftCertificate> findGiftCertificateByTagName(String name);
+
+    List<GiftCertificate> searchGiftCertificate(String filter);
+
+    List<GiftCertificate> sortGiftCertificate(String sort);
 }

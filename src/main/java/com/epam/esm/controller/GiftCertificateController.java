@@ -52,23 +52,34 @@ public class GiftCertificateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GiftCertificate>> findAllGiftCertificate() throws NotFoundException {
+    public ResponseEntity<List<GiftCertificate>> findAllGiftCertificate() {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllGiftCertificate();
-        if (!giftCertificates.isEmpty()) {
-            return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Gift certificates not found");
-        }
+        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
     }
 
-    @GetMapping("/tags")
-    public ResponseEntity<List<GiftCertificate>> findGiftCertificateByTagName(@RequestParam String name) throws NotFoundException {
+    @GetMapping(params = {"tagName"})
+    public ResponseEntity<List<GiftCertificate>> findGiftCertificateByTagName(@RequestParam("tagName") String name) throws NotFoundException {
+        logger.debug("Name: " + name);
         List<GiftCertificate> giftCertificates = giftCertificateService.findGiftCertificateByTagName(name);
         if (!giftCertificates.isEmpty()) {
             return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
         } else {
             throw new NotFoundException("Gift certificates not found, tag name = " + name);
         }
+    }
+
+    @GetMapping(params = {"filter"})
+    public ResponseEntity<List<GiftCertificate>> searchGiftCertificate(@RequestParam("filter") String filter) {
+        logger.debug("Filter: " + filter);
+        List<GiftCertificate> giftCertificates = giftCertificateService.searchGiftCertificate(filter);
+        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+    }
+
+    @GetMapping(params = {"sort"})
+    public ResponseEntity<List<GiftCertificate>> sortGiftCertificate(@RequestParam("sort") String sort) {
+        logger.debug("Sort: " + sort);
+        List<GiftCertificate> giftCertificates = giftCertificateService.sortGiftCertificate(sort);
+        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
     }
 
     @PutMapping("/{certificateId}")

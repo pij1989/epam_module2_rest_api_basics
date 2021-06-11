@@ -9,11 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private static final String COMMA_DELIMITER = ",";
+    private static final String ASC = "asc";
+    private static final String DESC = "desc";
+    private static final String NAME = "name";
+    private static final String CREATE_DATE = "createDate";
     private final GiftCertificateDao giftCertificateDao;
     private final TagDao tagDao;
 
@@ -105,5 +112,49 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public List<GiftCertificate> findGiftCertificateByTagName(String name) {
         return giftCertificateDao.findGiftCertificatesByTagName(name);
+    }
+
+    @Override
+    @Transactional
+    public List<GiftCertificate> searchGiftCertificate(String filter) {
+        return giftCertificateDao.findGiftCertificateLikeNameOrDescription(filter);
+    }
+
+    @Override
+    @Transactional
+    public List<GiftCertificate> sortGiftCertificate(String sort) {
+        String[] requestParameters = sort.split(COMMA_DELIMITER);
+        String type = requestParameters[0].trim();
+        String order = requestParameters[1].trim().toLowerCase();
+        List<GiftCertificate> giftCertificates = giftCertificateDao.findAll();
+        switch (type) {
+            case NAME: {
+                return sort(giftCertificates, Comparator.comparing(GiftCertificate::getName), order);
+            }
+            case CREATE_DATE: {
+                return sort(giftCertificates, Comparator.comparing(GiftCertificate::getCreateDate), order);
+            }
+            default: {
+                return giftCertificates;
+            }
+        }
+    }
+
+    private List<GiftCertificate> sort(List<GiftCertificate> giftCertificates, Comparator<GiftCertificate> comparator, String order) {
+        switch (order) {
+            case ASC: {
+                return giftCertificates.stream()
+                        .sorted(comparator)
+                        .collect(Collectors.toList());
+            }
+            case DESC: {
+                return giftCertificates.stream()
+                        .sorted(comparator.reversed())
+                        .collect(Collectors.toList());
+            }
+            default: {
+                return giftCertificates;
+            }
+        }
     }
 }
