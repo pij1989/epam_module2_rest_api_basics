@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -25,7 +27,8 @@ import java.util.Objects;
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@PropertySource("classpath:database.properties")
+@PropertySource("${path.configure}")
+@EnableTransactionManagement
 @EnableWebMvc
 public class WebAppConfiguration implements WebMvcConfigurer {
     private static final String DB_URL = "db.url";
@@ -34,6 +37,9 @@ public class WebAppConfiguration implements WebMvcConfigurer {
     private static final String DB_DRIVER = "db.driver";
     private static final String POOL_INITIAL_SIZE = "pool.initialSize";
     private static final String POOL_MAX_TOTAL = "pool.maxTotal";
+
+    @Value("${path.changelog}")
+    private String changeLog;
 
     private final Environment env;
 
@@ -62,7 +68,7 @@ public class WebAppConfiguration implements WebMvcConfigurer {
     @Bean
     public SpringLiquibase liquibase() {
         SpringLiquibase springLiquibase = new SpringLiquibase();
-        springLiquibase.setChangeLog("classpath:changeLog.xml");
+        springLiquibase.setChangeLog(changeLog);
         springLiquibase.setDataSource(dataSource());
         return springLiquibase;
     }
