@@ -24,13 +24,13 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = {TestConfiguration.class})
 @ActiveProfiles("unit")
 class TagServiceImplTest {
-    Tag tag;
+    private Tag tag;
 
     @Autowired
-    TagDao tagDao;
+    private TagDao tagDao;
 
     @Autowired
-    TagService tagService;
+    private TagService tagService;
 
     @BeforeEach
     void setUp() {
@@ -57,7 +57,6 @@ class TagServiceImplTest {
         Long id = 1L;
         when(tagDao.findById(id)).thenReturn(Optional.of(tag));
         Optional<Tag> actual = tagService.findTag(id);
-        verify(tagDao, times(1)).findById(id);
         assertEquals(Optional.of(tag), actual);
     }
 

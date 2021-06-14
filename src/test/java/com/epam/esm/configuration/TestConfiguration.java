@@ -1,5 +1,6 @@
 package com.epam.esm.configuration;
 
+import com.epam.esm.model.dao.GiftCertificateDao;
 import com.epam.esm.model.dao.TagDao;
 import liquibase.integration.spring.SpringLiquibase;
 import org.mockito.Mockito;
@@ -53,5 +54,11 @@ public class TestConfiguration {
     @Profile("unit")
     public TagDao tagDao() {
         return Mockito.mock(TagDao.class);
+    }
+
+    @Bean
+    @Profile("unit")
+    public GiftCertificateDao giftCertificateDao(){
+        return Mockito.mock(GiftCertificateDao.class);
     }
 }
