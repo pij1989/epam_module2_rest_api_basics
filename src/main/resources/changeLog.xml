@@ -36,9 +36,9 @@
             gift_certificate_id bigint NOT NULL,
             tag_id bigint NOT NULL,
             CONSTRAINT gift_certificate_tag_gift_certificate_id_fk FOREIGN KEY (gift_certificate_id)
-            REFERENCES public.gift_certificate (id),
+            REFERENCES public.gift_certificate (id) ON DELETE CASCADE,
             CONSTRAINT gift_certificate_tag_tag_id_fk FOREIGN KEY (tag_id)
-            REFERENCES public.tag (id)
+            REFERENCES public.tag (id) ON DELETE CASCADE
             )
         </sql>
     </changeSet>

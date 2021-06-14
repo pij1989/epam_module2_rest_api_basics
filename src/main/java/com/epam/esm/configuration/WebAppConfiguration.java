@@ -27,7 +27,7 @@ import java.util.Objects;
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@PropertySource("${path.configure}")
+@PropertySource("${path.configure:classpath:database.properties}")
 @EnableTransactionManagement
 @EnableWebMvc
 public class WebAppConfiguration implements WebMvcConfigurer {
@@ -38,7 +38,7 @@ public class WebAppConfiguration implements WebMvcConfigurer {
     private static final String POOL_INITIAL_SIZE = "pool.initialSize";
     private static final String POOL_MAX_TOTAL = "pool.maxTotal";
 
-    @Value("${path.changelog}")
+    @Value("${path.changelog:classpath:changeLog.xml}")
     private String changeLog;
 
     private final Environment env;
