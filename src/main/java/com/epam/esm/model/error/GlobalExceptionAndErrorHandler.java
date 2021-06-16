@@ -2,6 +2,9 @@ package com.epam.esm.model.error;
 
 import com.epam.esm.model.exception.BadRequestException;
 import com.epam.esm.model.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -13,13 +16,22 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @RestControllerAdvice
 public class GlobalExceptionAndErrorHandler {
 
+    private final ReloadableResourceBundleMessageSource messageSource;
+
+    @Autowired
+    public GlobalExceptionAndErrorHandler(ReloadableResourceBundleMessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
     @ExceptionHandler({NotFoundException.class, NoHandlerFoundException.class})
     public ResponseEntity<Object> customHandleNotFound(Exception e) {
         CustomError customError = new CustomError();
         if (e instanceof NotFoundException) {
-            customError.setErrorMessage(e.getMessage());
+//            customError.setErrorMessage(e.getMessage());
+            customError.setErrorMessage(messageSource.getMessage("error.404.tag", null, LocaleContextHolder.getLocale()));
         } else {
-            customError.setErrorMessage("Resource not found");
+//            customError.setErrorMessage("Resource not found");
+            customError.setErrorMessage(messageSource.getMessage("error.404.common", null, LocaleContextHolder.getLocale()));
         }
         customError.setErrorCode(Integer.toString(HttpStatus.NOT_FOUND.value()));
         return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
