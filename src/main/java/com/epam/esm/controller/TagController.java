@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import static com.epam.esm.model.error.MessageKeyError.TAG_BAD_REQUEST;
+import static com.epam.esm.model.error.MessageKeyError.TAG_NOT_FOUND;
+
 @RestController
 @RequestMapping("/tags")
 public class TagController {
@@ -45,11 +48,11 @@ public class TagController {
             parseId = Long.parseLong(id);
         } catch (NumberFormatException e) {
             logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException("Bad request, id = " + id, e);
+            throw new BadRequestException(TAG_BAD_REQUEST, e, new Object[]{id});
         }
         Optional<Tag> optionalTag = tagService.findTag(parseId);
         return optionalTag.map(tag -> new ResponseEntity<>(tag, HttpStatus.OK))
-                .orElseThrow(() -> new NotFoundException("Tag not found, id = " + id));
+                .orElseThrow(() -> new NotFoundException(TAG_NOT_FOUND, new Object[]{id}));
     }
 
     @GetMapping
@@ -66,12 +69,12 @@ public class TagController {
             parseId = Long.parseLong(id);
         } catch (NumberFormatException e) {
             logger.error("Bad request:" + e.getMessage());
-            throw new BadRequestException("Bad request, id = " + id, e);
+            throw new BadRequestException(TAG_BAD_REQUEST, e, new Object[]{id});
         }
         if (tagService.deleteTag(parseId)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            throw new NotFoundException("Tag not found, id = " + id);
+            throw new NotFoundException(TAG_NOT_FOUND, new Object[]{id});
         }
     }
 }

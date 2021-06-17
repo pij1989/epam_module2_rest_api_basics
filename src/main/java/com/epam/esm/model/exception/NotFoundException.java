@@ -1,7 +1,12 @@
 package com.epam.esm.model.exception;
 
-public class NotFoundException extends Exception {
+public class NotFoundException extends RestException {
+
     public NotFoundException(String message) {
-        super(message);
+        this(message, new Object[]{});
+    }
+
+    public NotFoundException(String message, Object[] args) {
+        super(message, args);
     }
 }

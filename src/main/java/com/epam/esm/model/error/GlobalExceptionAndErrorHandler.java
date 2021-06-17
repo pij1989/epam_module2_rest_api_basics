@@ -15,7 +15,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionAndErrorHandler {
-
     private final ReloadableResourceBundleMessageSource messageSource;
 
     @Autowired
@@ -27,11 +26,11 @@ public class GlobalExceptionAndErrorHandler {
     public ResponseEntity<Object> customHandleNotFound(Exception e) {
         CustomError customError = new CustomError();
         if (e instanceof NotFoundException) {
-//            customError.setErrorMessage(e.getMessage());
-            customError.setErrorMessage(messageSource.getMessage("error.404.tag", null, LocaleContextHolder.getLocale()));
+            customError.setErrorMessage(messageSource.getMessage(e.getMessage(), ((NotFoundException) e).getArgs(),
+                    LocaleContextHolder.getLocale()));
         } else {
-//            customError.setErrorMessage("Resource not found");
-            customError.setErrorMessage(messageSource.getMessage("error.404.common", null, LocaleContextHolder.getLocale()));
+            customError.setErrorMessage(messageSource.getMessage(MessageKeyError.NOT_FOUND, null,
+                    LocaleContextHolder.getLocale()));
         }
         customError.setErrorCode(Integer.toString(HttpStatus.NOT_FOUND.value()));
         return new ResponseEntity<>(customError, HttpStatus.NOT_FOUND);
@@ -41,18 +40,21 @@ public class GlobalExceptionAndErrorHandler {
     public ResponseEntity<Object> customHandleBadRequest(Exception e) {
         CustomError customError = new CustomError();
         if (e instanceof BadRequestException) {
-            customError.setErrorMessage(e.getMessage());
+            customError.setErrorMessage(messageSource.getMessage(e.getMessage(), ((BadRequestException) e).getArgs(),
+                    LocaleContextHolder.getLocale()));
         } else {
-            customError.setErrorMessage("Bad request");
+            customError.setErrorMessage(messageSource.getMessage(MessageKeyError.BAD_REQUEST, null,
+                    LocaleContextHolder.getLocale()));
         }
         customError.setErrorCode(Integer.toString(HttpStatus.BAD_REQUEST.value()));
         return new ResponseEntity<>(customError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<Object> customHandleMethodNotAllowed(Exception e) {
+    public ResponseEntity<Object> handleMethodNotAllowed() {
         CustomError customError = new CustomError();
-        customError.setErrorMessage("Method not allowed");
+        customError.setErrorMessage(messageSource.getMessage(MessageKeyError.METHOD_NOT_ALLOWED, null,
+                LocaleContextHolder.getLocale()));
         customError.setErrorCode(Integer.toString(HttpStatus.METHOD_NOT_ALLOWED.value()));
         return new ResponseEntity<>(customError, HttpStatus.METHOD_NOT_ALLOWED);
     }
@@ -60,7 +62,8 @@ public class GlobalExceptionAndErrorHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleInternalServerError() {
         CustomError customError = new CustomError();
-        customError.setErrorMessage("Internal server error");
+        customError.setErrorMessage(messageSource.getMessage(MessageKeyError.INTERNAL_SERVER_ERROR, null,
+                LocaleContextHolder.getLocale()));
         customError.setErrorCode(Integer.toString(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         return new ResponseEntity<>(customError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
